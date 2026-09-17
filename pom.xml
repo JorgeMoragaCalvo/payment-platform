@@ -43,6 +43,21 @@
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
 
+        <!--
+          Versioned migrations for local development and tests only. Production DDL is written by
+          hand: the database this module reads is owned by a much larger system with its own
+          migration history, so Flyway must never be pointed at it.
+          flyway-mysql is a separate artifact and is required for MySQL support.
+        -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
@@ -66,6 +81,32 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+          Tests run against real MySQL, not H2: the RUT lookup relies on MySQL's
+          UPPER(REPLACE(...)) and the payment idempotency guards rely on a unique index accepting
+          several NULLs. A different engine would not exercise either.
+
+          No <version> needed: spring-boot-dependencies imports testcontainers-bom. Note the
+          artifact names are the Testcontainers 2.x ones — the modules were renamed from
+          "mysql"/"junit-jupiter" to "testcontainers-mysql"/"testcontainers-junit-jupiter", and the
+          1.x coordinates fail to resolve with no version found.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-mysql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
