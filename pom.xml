@@ -59,9 +59,14 @@
           migration history, so Flyway must never be pointed at it.
           flyway-mysql is a separate artifact and is required for MySQL support.
         -->
+        <!--
+          Boot 4 moved Flyway's auto-configuration into its own starter. With only flyway-core on
+          the classpath nothing runs the migrations, and schema validation then fails at startup
+          with "missing table" before the first test.
+        -->
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
