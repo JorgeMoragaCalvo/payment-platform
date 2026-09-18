@@ -58,11 +58,14 @@ jobs:
           --health-start-period=30s
 
     steps:
+      # Action majors: v5 is the Node 24 line. The v4 line runs on Node 20, which GitHub has retired,
+      # and a job on it warns today and stops running later. Check the action's own repo for the
+      # current major before touching these; do not write a version from memory.
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
@@ -89,7 +92,7 @@ jobs:
       - name: Publish test report
         # Runs even when the build failed: a red run is exactly when the report is worth reading.
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: surefire-reports
           path: target/surefire-reports/

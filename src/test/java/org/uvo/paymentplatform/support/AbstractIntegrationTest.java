@@ -31,8 +31,17 @@ import java.util.List;
 @Import(FakeWebpayClient.class)
 public abstract class AbstractIntegrationTest {
 
-    /** Every table a case can write, in no particular order — the checks are off while truncating. */
-    private static final List<String> TABLES = List.of(
+    /**
+     * Every table a case can write, <b>children before parents</b>. The mirror schema carries the
+     * real foreign keys from production, so the order is what makes plain deletes work.
+     *
+     * <p>Not TRUNCATE with the checks switched off: {@code SET FOREIGN_KEY_CHECKS} is a session
+     * variable, and outside a transaction each statement may run on a different pooled connection
+     * — the SET on one, the TRUNCATE on another where the checks are still on, and MySQL refuses to
+     * truncate a referenced table. Wrapping it in a transaction does not help either, because
+     * TRUNCATE commits implicitly. Ordered deletes need neither trick.
+     */
+    private static final List<String> TABLES_CHILDREN_FIRST = List.of(
             "webpay_transactions",
             "bank_movements",
             "bank_statements",
@@ -54,15 +63,8 @@ public abstract class AbstractIntegrationTest {
     void cleanDatabase() {
         webpay.reset();
 
-        // The mirror schema carries the real foreign keys from production, so the payment table
-        // cannot be emptied before its parents unless the checks are suspended.
-        jdbc.execute("SET FOREIGN_KEY_CHECKS = 0");
-        try {
-            for (String table : TABLES) {
-                jdbc.execute("TRUNCATE TABLE " + table);
-            }
-        } finally {
-            jdbc.execute("SET FOREIGN_KEY_CHECKS = 1");
+        for (String table : TABLES_CHILDREN_FIRST) {
+            jdbc.update("DELETE FROM " + table);
         }
     }
 
