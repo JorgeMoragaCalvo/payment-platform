@@ -92,7 +92,8 @@ jobs:
       - name: Publish test report
         # Runs even when the build failed: a red run is exactly when the report is worth reading.
         if: always()
-        uses: actions/upload-artifact@v5
+        # v6 is the first major that targets Node 24 itself; v5 still declares Node 20 and warns.
+        uses: actions/upload-artifact@v6
         with:
           name: surefire-reports
           path: target/surefire-reports/
