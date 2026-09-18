@@ -44,6 +44,16 @@
         </dependency>
 
         <!--
+          Session-cookie authentication against the existing user table. Bcrypt is what makes that
+          possible without migrating a single password: the stored hashes are $2y$, which Spring's
+          BCryptPasswordEncoder verifies as-is.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!--
           Versioned migrations for local development and tests only. Production DDL is written by
           hand: the database this module reads is owned by a much larger system with its own
           migration history, so Flyway must never be pointed at it.
@@ -81,6 +91,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- @WithMockUser, for the tests asserting a non-admin gets 403 on every staff action. -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
 

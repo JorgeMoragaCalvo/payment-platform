@@ -64,9 +64,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "email_verified_at")
-    private LocalDateTime emailVerifiedAt;
-
     /** Bcrypt hash written by Laravel ({@code $2y$}), which Spring's encoder verifies as-is. */
     @Column(nullable = false)
     private String password;
@@ -78,7 +75,11 @@ public class User {
     @JoinColumn(name = "empresa_id")
     private Customer customer;
 
-    @Column(nullable = false)
+    /**
+     * Nullable with a default of 1 in production, and a {@code tinyint} — the explicit column
+     * definition is what keeps schema validation from expecting an {@code int}.
+     */
+    @Column(columnDefinition = "tinyint")
     @Builder.Default
     private Integer status = 1;
 

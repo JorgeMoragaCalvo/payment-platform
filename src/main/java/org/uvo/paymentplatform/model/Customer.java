@@ -77,7 +77,8 @@ public class Customer {
     @Column(name = "tipoPlan", length = 45)
     private String tipoPlan;
 
-    @Column(nullable = false, length = 45)
+    /** Nullable in production, so {@code isActive()} has to treat null as "not active". */
+    @Column(length = 45)
     @Builder.Default
     private String estado = ESTADO_ACTIVE;
 
@@ -93,13 +94,11 @@ public class Customer {
     private LocalDateTime deletedAt;
 
     /**
-     * No {@code nullable = false} and no FK constraint anywhere in this module: none of the Laravel
-     * migrations declare {@code foreign()}, on purpose — {@code imported_by}/{@code reconciled_by}/
-     * {@code user_id} point at a table with logical deletes, and an FK would block deleting users.
+     * There is deliberately NO association to the plan table here. In production
+     * {@code datos_plan.empresa_id} is an {@code int} while this table's {@code id} is
+     * {@code bigint unsigned}, so the two sides cannot be joined type-safely and schema validation
+     * rejects the mapping. The active plan is therefore looked up by id through its repository.
      */
-    @OneToMany(mappedBy = "customer")
-    private List<DatosPlan> datosPlanes;
-
     @OneToMany(mappedBy = "customer")
     private List<SuscriptorPayment> payments;
 

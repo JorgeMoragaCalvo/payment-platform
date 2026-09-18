@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Este proyecto ###
+# Cartolas subidas. Una cartola lista TODOS los movimientos de la cuenta bancaria de la empresa,
+# así que este directorio no se versiona, no se sirve estáticamente y no entra en ningún backup
+# que aterrice en un web root. Es el default de cartolas.root.
+var/
+
+# Credenciales locales. Nunca en el repo.
+.env
+*.env.local
+.gitignore

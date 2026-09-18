@@ -26,7 +26,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * disabled for reasons unrelated to payment. Hence three conditions:
      *
      * <ul>
-     *   <li>{@code role IS NULL} — never touch staff accounts.
+     *   <li>{@code role IS NULL} and {@code isUvo = 0} — never touch staff accounts. Production
+     *       carries both flags: {@code isUvo} predates this module, {@code role} is this module's
+     *       own, and until user administration is unified a staff member may be marked with either.
      *   <li>{@code deleted_at IS NULL} — spelled out because the entity's restriction does not apply
      *       to bulk or native statements.
      *   <li>{@code status <> :status} — makes the call idempotent, and makes the returned count mean
@@ -44,8 +46,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
                SET status = :status
              WHERE empresa_id = :customerId
                AND role IS NULL
+               AND (isUvo IS NULL OR isUvo = 0)
                AND deleted_at IS NULL
-               AND status <> :status
+               AND (status IS NULL OR status <> :status)
             """, nativeQuery = true)
     int updateStatusByCustomerId(@Param("customerId") Long customerId, @Param("status") Integer status);
 }

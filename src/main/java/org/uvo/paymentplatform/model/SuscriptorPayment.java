@@ -99,7 +99,8 @@ public class SuscriptorPayment {
     @Column(name = "comprobante_path", length = 500)
     private String comprobantePath;
 
-    @Column(name = "comprobante_tipo", length = 10)
+    /** An ENUM in production, not a varchar — mapped as String, with the definition spelled out. */
+    @Column(name = "comprobante_tipo", columnDefinition = "enum('jpg','jpeg','png','pdf')")
     private String comprobanteTipo;
 
     @Column(name = "comprobante_nombre_original")

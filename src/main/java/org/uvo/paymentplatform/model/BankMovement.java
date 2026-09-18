@@ -141,6 +141,12 @@ public class BankMovement {
         }
     }
 
+    /**
+     * How a card-processor payout is tagged at import, and how the settlement view finds it again.
+     * Shared by the importer that writes it and the report that reads it, so the two cannot drift.
+     */
+    public static final String MATCH_REASON_TRANSBANK_PAYOUT = "Liquidación Transbank";
+
     /** Decided already, by a staff click, by auto-confirmation, or by the Transbank payout tag. */
     private static final Set<Status> RESOLVED = EnumSet.of(Status.MATCHED, Status.IGNORED);
 
@@ -190,7 +196,7 @@ public class BankMovement {
     private SuscriptorPayment payment;
 
     /** {@code min(100, score)} over a 105-point maximum — a display figure, not a probability. */
-    @Column(name = "match_confidence")
+    @Column(name = "match_confidence", columnDefinition = "tinyint")
     private Integer matchConfidence;
 
     @Column(name = "match_reason")

@@ -1,0 +1,97 @@
+name: CI
+
+# feature/** is where the work happens, main is what must never break, and the pull_request
+# trigger is what gates the merge between them. A push to a feature branch that already has an
+# open PR runs once for the push and once for the PR; the concurrency block below cancels the
+# stale run rather than paying for both.
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The JVM the developer actually runs. The POM still targets release 17, so the bytecode stays
+  # 17 either way — this only makes CI match the local toolchain.
+  JAVA_VERSION: '21'
+
+  # The database the tests build from scratch. Nothing here is a secret: it is a throwaway
+  # container that lives for the length of the job, and the real credentials never reach CI.
+  DB_NAME: uvopos_ci
+  DB_USER: root
+  DB_PASSWORD: ci-local-only
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    # A real MySQL, not an in-memory database. The RUT lookup relies on MySQL's
+    # UPPER(REPLACE(...)) and the payment idempotency guards rely on a unique index accepting
+    # several NULLs — a different engine would exercise neither, which is the whole reason the
+    # tests are wired this way.
+    services:
+      mysql:
+        image: mysql:8.0
+        # These two are spelled out instead of reading DB_PASSWORD / DB_NAME above, and they have
+        # to be: a `services` block cannot see the workflow's `env` context, so an expression here
+        # resolves to an empty string. Replacing them with ${{ env.* }} starts the container with
+        # no root password and the job dies on connect. Keep them in sync with the env block by
+        # hand.
+        env:
+          MYSQL_ROOT_PASSWORD: ci-local-only
+          MYSQL_DATABASE: uvopos_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -p$MYSQL_ROOT_PASSWORD --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+          --health-start-period=30s
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Build and test
+        # The application reads all three of these from the environment, with the local defaults
+        # only as a fallback, so pointing it at the service container needs no file changes.
+        #
+        # This step is what actually verifies the persistence layer: Flyway applies the mirror of
+        # the pre-change production schema and then the six statements of the coordinated change —
+        # so CI rehearses that migration on every push — and `ddl-auto=validate` then checks every
+        # entity mapping against the result. Spring Data bootstrapping the repositories is what
+        # validates the derived query names and the JPQL, none of which compiling can catch.
+        env:
+          DB_URL: jdbc:mysql://127.0.0.1:3306/${{ env.DB_NAME }}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Santiago
+          DB_USERNAME: ${{ env.DB_USER }}
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        # Invoked through sh rather than as ./mvnw: the wrapper was committed from Windows without
+        # the executable bit, and while that is fixed in the index, this keeps the job working for
+        # anyone whose checkout says otherwise.
+        run: sh ./mvnw -B --no-transfer-progress verify
+
+      - name: Publish test report
+        # Runs even when the build failed: a red run is exactly when the report is worth reading.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          if-no-files-found: ignore
+          retention-days: 7
