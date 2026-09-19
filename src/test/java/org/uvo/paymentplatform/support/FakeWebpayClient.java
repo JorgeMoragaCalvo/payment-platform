@@ -36,9 +36,14 @@ public class FakeWebpayClient {
 
     private final AtomicInteger commitCalls = new AtomicInteger();
 
+    /**
+     * Named differently from the production bean on purpose. {@code @Primary} settles which of two
+     * beans wins, but two beans with the same NAME are a definition override, which Boot refuses at
+     * startup — every test in the class would then fail before running.
+     */
     @Bean
     @Primary
-    public WebpayClient webpayClient() {
+    public WebpayClient fakeWebpayClient() {
         return new WebpayClient() {
             @Override
             public WebpayCreateResponse create(String buyOrder, String sessionId, int amount, String returnUrl) {
