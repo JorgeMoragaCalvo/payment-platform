@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uvo.paymentplatform.security.AuthenticatedUser;
 
 /**
- * Email and password login. No registration and no password reset, deliberately: accounts come
+ * Email and password login. No registration and no password reset deliberately: accounts come
  * from the production user table.
  *
  * <p>Session cookie rather than a token, which is the cheapest arrangement that keeps the gateway
@@ -64,7 +64,7 @@ public class AuthController {
 
     /**
      * @param isAdmin what the frontend routes on: staff land on the customer list, everyone else on
-     *                their own account. The decision is reported rather than performed, because a
+     *                their own account. The decision is reported rather than performed because a
      *                single-page frontend does its own navigation.
      */
     public record MeResponse(long id, String name, String email, boolean isAdmin, Long empresaId) {
@@ -118,7 +118,7 @@ public class AuthController {
 
     /**
      * Who is logged in. New here rather than ported: a server-rendered page always knew, and a
-     * single-page frontend has to ask on load.
+     * single-page frontend has to ask on a load.
      */
     @GetMapping("/me")
     public ResponseEntity<MeResponse> me(@AuthenticationPrincipal AuthenticatedUser user) {

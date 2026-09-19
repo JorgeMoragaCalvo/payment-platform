@@ -1,0 +1,69 @@
+/* Admin shell: sidebar + main. Reflows to a top bar under 992px with CSS only. */
+.pa-shell { display: flex; min-height: 100vh; }
+
+.pa-sidebar {
+  width: var(--pa-nav-width); flex: 0 0 auto; background: var(--pa-nav-bg); color: var(--pa-nav-text);
+  display: flex; flex-direction: column; padding: 1rem .75rem;
+}
+.pa-sidebar__brand { display: flex; align-items: center; gap: .5rem; color: #fff; font-weight: 700; padding: .25rem .5rem 1rem; }
+.pa-sidebar__mark { width: 12px; height: 12px; border-radius: 3px; background: var(--pa-info-strong); }
+.pa-sidebar__nav { display: flex; flex-direction: column; gap: .25rem; }
+.pa-nav-item {
+  display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; border-radius: var(--pa-radius);
+  color: var(--pa-nav-text); text-decoration: none;
+}
+.pa-nav-item:hover { color: var(--pa-nav-text-active); text-decoration: none; background: var(--pa-nav-active-bg); }
+.pa-nav-item.is-active { color: var(--pa-nav-text-active); background: var(--pa-nav-active-bg); }
+.pa-nav-item__badge {
+  margin-left: auto; background: var(--pa-overdue-strong); color: #fff; font-size: .75rem; font-weight: 700;
+  padding: .1rem .45rem; border-radius: var(--pa-radius-pill);
+}
+
+.pa-main { flex: 1 1 auto; min-width: 0; }
+.pa-main__inner { max-width: var(--pa-content-max); margin: 0 auto; padding: 1.25rem; }
+.pa-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1.25rem; }
+.pa-header__actions { display: flex; align-items: center; gap: 1rem; }
+.pa-user-chip { display: flex; align-items: center; gap: .5rem; }
+.pa-user-chip__avatar {
+  width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--pa-info-tint); color: var(--pa-info-strong); font-weight: 700;
+}
+.pa-user-chip__name { font-weight: 600; }
+.pa-user-chip__role { color: var(--pa-text-muted); font-size: .85rem; }
+.pa-logout { background: none; border: 1px solid var(--pa-border); border-radius: var(--pa-radius); padding: .35rem .75rem; cursor: pointer; }
+.pa-foot { color: var(--pa-text-muted); font-size: .85rem; margin-top: 2rem; }
+
+.pa-card { background: var(--pa-surface); border: 1px solid var(--pa-border); border-radius: var(--pa-radius-lg); box-shadow: var(--pa-shadow-sm); margin-bottom: 1.25rem; }
+.pa-card__header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .9rem 1.25rem; border-bottom: 1px solid var(--pa-border); }
+.pa-card__title { font-size: 1.05rem; font-weight: 700; margin: 0; }
+.pa-card__body { padding: 1.25rem; }
+
+/* Status filter tiles: buttons, so they are keyboard-reachable and carry aria-pressed. */
+.pa-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.25rem; }
+.pa-stat {
+  text-align: left; background: var(--pa-surface); border: 1px solid var(--pa-border); border-left: 4px solid var(--pa-accent-strong);
+  border-radius: var(--pa-radius-lg); padding: 1rem; cursor: pointer; display: flex; flex-direction: column; gap: .15rem;
+}
+.pa-stat.is-active { background: var(--pa-accent-tint); border-color: var(--pa-accent-border); border-left-color: var(--pa-accent-strong); }
+.pa-stat:focus-visible { outline: 2px solid var(--pa-info-strong); outline-offset: 2px; }
+.pa-stat__label { color: var(--pa-text-muted); font-size: .85rem; }
+.pa-stat__value { font-size: 1.75rem; font-weight: 700; color: var(--pa-accent-strong); }
+.pa-stat__meta { color: var(--pa-text-muted); font-size: .85rem; }
+
+.pa-table tbody tr { cursor: pointer; }
+.pa-due--overdue { color: var(--pa-overdue-strong); font-weight: 600; }
+.pa-due--due_soon { color: var(--pa-due_soon-strong); font-weight: 600; }
+
+.pa-tabs { display: flex; gap: .25rem; list-style: none; padding: 0; margin: 0 0 1.25rem; border-bottom: 1px solid var(--pa-border); }
+.pa-tabs__link {
+  display: inline-flex; align-items: center; gap: .5rem; padding: .6rem .9rem; border: 0; background: none; cursor: pointer;
+  color: var(--pa-text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.pa-tabs__link.is-active { color: var(--pa-text); border-bottom-color: var(--pa-info-strong); font-weight: 600; }
+
+@media (max-width: 991px) {
+  .pa-shell { flex-direction: column; }
+  .pa-sidebar { width: auto; flex-direction: row; align-items: center; gap: 1rem; padding: .5rem .75rem; }
+  .pa-sidebar__brand { padding: 0; }
+  .pa-sidebar__nav { flex-direction: row; }
+}

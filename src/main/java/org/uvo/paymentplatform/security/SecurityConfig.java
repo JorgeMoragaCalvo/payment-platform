@@ -76,9 +76,15 @@ public class SecurityConfig {
                         .sessionFixation(fixation -> fixation.changeSessionId()))
 
                 // An API answers with a status code. Redirecting to a login page would hand the
-                // frontend an HTML document where it expected JSON.
+                // frontend an HTML document where it expected JSON. Only the entry point is
+                // replaced: an unauthenticated request is 401, while a rejected CSRF token keeps
+                // Spring's default 403, so the frontend can tell "log in again" from "your token is
+                // stale" — a stale token after a backend restart used to surface as "session
+                // expired", which sent people in circles.
                 .exceptionHandling(handling -> handling
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .accessDeniedHandler((request, response, e) ->
+                                response.sendError(HttpStatus.FORBIDDEN.value())))
 
                 .formLogin(login -> login.disable())
                 .httpBasic(basic -> basic.disable())

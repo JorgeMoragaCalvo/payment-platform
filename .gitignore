@@ -42,3 +42,4 @@ var/
 .env
 *.env.local
 .gitignore
+CLAUDE.md
