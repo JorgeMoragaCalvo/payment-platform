@@ -1,0 +1,66 @@
+/*
+ * Design tokens, declared once. The Blade app kept two copies of this block because it had no shared
+ * layout; React has one, so the duplication is gone. Every custom class is `pa-` prefixed so nothing
+ * collides with Bootstrap.
+ */
+:root {
+  --pa-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --pa-page-bg: #f4f6f9;
+  --pa-surface: #ffffff;
+  --pa-text: #1f2933;
+  --pa-text-muted: #6b7280;
+  --pa-border: #e2e5ea;
+  --pa-radius: 8px;
+  --pa-radius-sm: 6px;
+  --pa-radius-lg: 12px;
+  --pa-radius-pill: 999px;
+  --pa-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --pa-shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+
+  /* Per-status accent triples. `.pa-bar--<status>` and `.pa-stat--<status>` remap the generic
+     --pa-accent-* variables from these, so a new status is one CSS block, not a new mapping. */
+  --pa-on_time-strong: #16a34a;  --pa-on_time-tint: #ecfdf3;  --pa-on_time-border: #b7ebc6;
+  --pa-due_soon-strong: #d97706; --pa-due_soon-tint: #fffaeb; --pa-due_soon-border: #fde3a7;
+  --pa-overdue-strong: #dc2626;  --pa-overdue-tint: #fef3f2;  --pa-overdue-border: #fecdca;
+  --pa-neutral-strong: #6b7280;  --pa-neutral-tint: #f3f4f6;  --pa-neutral-border: #e5e7eb;
+  --pa-info-strong: #2563eb;     --pa-info-tint: #eff6ff;     --pa-info-border: #bfdbfe;
+
+  --pa-nav-bg: #111827;
+  --pa-nav-active-bg: #1f2937;
+  --pa-nav-text: #9ca3af;
+  --pa-nav-text-active: #ffffff;
+  --pa-nav-width: 208px;
+  --pa-content-max: 1280px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--pa-font);
+  background: var(--pa-page-bg);
+  color: var(--pa-text);
+}
+
+/* Bootstrap 4 has no orange variant; these two are what the status badge/alert use for due_soon. */
+.alert-orange {
+  color: #92400e;
+  background-color: var(--pa-due_soon-tint);
+  border-color: var(--pa-due_soon-border);
+}
+.badge-orange {
+  color: #fff;
+  background-color: var(--pa-due_soon-strong);
+}
+
+.pa-bar--on_time,  .pa-stat--on_time  { --pa-accent-strong: var(--pa-on_time-strong);  --pa-accent-tint: var(--pa-on_time-tint);  --pa-accent-border: var(--pa-on_time-border); }
+.pa-bar--due_soon, .pa-stat--due_soon { --pa-accent-strong: var(--pa-due_soon-strong); --pa-accent-tint: var(--pa-due_soon-tint); --pa-accent-border: var(--pa-due_soon-border); }
+.pa-bar--overdue,  .pa-stat--overdue  { --pa-accent-strong: var(--pa-overdue-strong);  --pa-accent-tint: var(--pa-overdue-tint);  --pa-accent-border: var(--pa-overdue-border); }
+.pa-stat--info                        { --pa-accent-strong: var(--pa-info-strong);     --pa-accent-tint: var(--pa-info-tint);     --pa-accent-border: var(--pa-info-border); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
