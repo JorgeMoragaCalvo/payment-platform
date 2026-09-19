@@ -17,9 +17,9 @@ import org.uvo.paymentplatform.config.WebpayProperties;
  * checklist has to include starting a real checkout. Whether to add an eager check at startup as
  * well is still an open decision.
  *
- * <p>What is NOT here yet: the comparison against the SDK's own published sandbox credentials. Those
- * constants belong to the SDK, and the SDK has not been chosen; once it is, this guard has to reject
- * them too, not just empty values.
+ * <p>"Still the defaults" means blank <i>or</i> equal to Transbank's published sandbox credentials:
+ * the sandbox values are what the client falls back to, so a production deploy that forgot the
+ * variables would otherwise point at the live host with the public test keys.
  */
 @Component
 public class WebpayOptionsGuard {
@@ -51,16 +51,17 @@ public class WebpayOptionsGuard {
     }
 
     private static void assertRealCredentials(String commerceCode, String apiKey) {
-        if (commerceCode == null || commerceCode.isBlank()) {
+        if (commerceCode == null || commerceCode.isBlank()
+                || commerceCode.equals(WebpayRestClient.INTEGRATION_COMMERCE_CODE)) {
             throw new IllegalStateException(
-                    "WEBPAY_ENVIRONMENT is \"production\" but WEBPAY_COMMERCE_CODE is not set. "
-                            + "Set the real one issued for your merchant contract.");
+                    "WEBPAY_ENVIRONMENT is \"production\" but WEBPAY_COMMERCE_CODE is still Transbank's "
+                            + "integration commerce code. Set the real one issued for your merchant contract.");
         }
 
-        if (apiKey == null || apiKey.isBlank()) {
+        if (apiKey == null || apiKey.isBlank() || apiKey.equals(WebpayRestClient.INTEGRATION_API_KEY)) {
             throw new IllegalStateException(
-                    "WEBPAY_ENVIRONMENT is \"production\" but WEBPAY_API_KEY is not set. "
-                            + "Set the real llave secreta from the merchant portal.");
+                    "WEBPAY_ENVIRONMENT is \"production\" but WEBPAY_API_KEY is still Transbank's "
+                            + "public integration key. Set the real llave secreta from the merchant portal.");
         }
     }
 }

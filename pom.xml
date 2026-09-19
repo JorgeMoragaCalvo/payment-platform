@@ -44,6 +44,16 @@
         </dependency>
 
         <!--
+          The outbound HTTP client for the Transbank REST API. Boot 4 split it into its own starter,
+          the same way it did with Flyway: without this, RestClient.Builder is not a bean and the
+          context fails to start.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-restclient</artifactId>
+        </dependency>
+
+        <!--
           Session-cookie authentication against the existing user table. Bcrypt is what makes that
           possible without migrating a single password: the stored hashes are $2y$, which Spring's
           BCryptPasswordEncoder verifies as-is.
